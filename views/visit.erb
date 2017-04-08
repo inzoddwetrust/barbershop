@@ -22,9 +22,9 @@
     <div class="form-group">
       <label>Choose the master:</label>
       <select name="master" class="form-control">
-        <option>Jessie Pinkman</option>
-        <option>Walter White</option>
-        <option>Gus Frin</option>
+        <option <%= @master == "Jessie Pinkman" ? "selected" : ""%>>Jessie Pinkman</option>
+        <option <%= @master == "Walter White" ? "selected" : ""%>>Walter White</option>
+        <option <%= @master == "Gus Frin" ? "selected" : ""%>>Gus Frin</option>
       </select>
     </div>
 

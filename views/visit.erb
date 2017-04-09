@@ -6,17 +6,17 @@
 
     <div class="form-group">
       <label>Your name</label>
-      <input name="username" type="text" class="form-control" placeholder="Name" value=<%=@username%>>
+      <input name="username" type="text" class="form-control" placeholder="Name" value=<%= @username%>>
     </div>
 
     <div class="form-group">
       <label>Contact phone number</label>
-      <input name="phone" type="text" class="form-control" placeholder="Phone" value=<%=@phone%>>
+      <input name="phone" type="text" class="form-control" placeholder="Phone" value=<%= @phone%>>
     </div>
 
     <div class="form-group">
-      <label>Time of visit</label>
-      <input name="time" type="text" class="form-control" placeholder="Time" value=<%=@time%>>
+      <label>Date of visit</label>
+      <input id="datetime" name="time" type="text" class="form-control" placeholder="Date and time" value=<%= @time%>>
     </div>
 
     <div class="form-group">
@@ -51,5 +51,6 @@
 
   <script type="text/javascript">
   $('#color').simplecolorpicker();
+  $('#datetime').datetimepicker({format:'d.m.Y H:i'});
   </script>
 </div>

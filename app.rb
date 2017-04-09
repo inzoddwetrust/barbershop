@@ -3,9 +3,9 @@ require 'sinatra'
 require 'sinatra/reloader'
 require 'sqlite3'
 
-configure do
-	@db = SQLite3::Database.new './public/main.db'
-	@db.execute 'CREATE TABLE IF NOT EXISTS
+#configure do
+	db = SQLite3::Database.new './public/main.db'
+	db.execute 'CREATE TABLE IF NOT EXISTS
 							"Users"
 							( "id" INTEGER PRIMARY KEY AUTOINCREMENT,
 								"username" TEXT,
@@ -13,7 +13,7 @@ configure do
 								"datestamp" TEXT,
 								"master" TEXT,
 								"color" TEXT )'
-end
+#end
 
 def file_read file
 	f = File.open file
@@ -85,6 +85,8 @@ post '/visit' do
 				}
 
 	return erb :visit if input_errors? hh
+
+	db.execute 'INSERT INTO Users (username, phone, datestamp, master, color) VALUES (?, ?, ?, ?, ?)', [@username, @phone, @time, @master, @color]
 
 	f = File.open "./public/users.txt", "a"
 	f.write "User: #{@username}, Phone: #{@phone}, Time: #{@time}, Master: #{@master}, Color: #{@color}\n"

@@ -51,3 +51,6 @@ build-iPhoneSimulator/
 
 public/users.txt
 public/questions.txt
+public/main
+public/main-journal
+public/main.db

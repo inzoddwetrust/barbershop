@@ -10,7 +10,7 @@ def get_db
 end
 
 def input_errors? hh
-		@error = hh.select {|key| params[key] == ""}.values.join(", then ").downcase.capitalize
+		@error = hh.select{|key| params[key] == ""}.values.join(", then ").capitalize
 		if @error == ''
 			@error = nil
 			return false
@@ -70,6 +70,7 @@ post '/' do
 				}
 
 	return erb :index if input_errors? hh
+
 	db=get_db
 
 	if @login == "admin" && @password == "secret"

@@ -2,6 +2,49 @@
 
   <h2>Admin panel</h2>
   <br>
-  <br>
-  <%= @entry%>
+  <% if @entry.instance_of? Array then%>
+    <h3>All clients</h3>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Name</th>
+          <th>Phone</th>
+          <th>Date and time</th>
+          <th>Master</th>
+          <th>Color</th>
+        </tr>
+      </thead>
+      <tbody>
+      <% @entry.each do |row|%>
+        <tr>
+          <th><%= row['id']%></th>
+          <td><%= row['username']%></td>
+          <td><%= row['phone']%></td>
+          <td><%= row['datestamp']%></td>
+          <td><%= row['master']%></td>
+          <td style="background:<%= row['color']%>;"></td>
+        </tr>
+      <% end%>
+      </tbody>
+    </table>
+    <br>
+    <br>
+    <h3>All messages</h3>
+    <hr>
+    <dl class="dl-horizontal">
+      <% @message.each do |row|%>
+      <% @textfield = row['message'].gsub("\n", "<br>")%>
+      <dt>E-mail:</dt>
+        <dd><%= row['email']%></dd>
+      <dt>Date and time:</dt>
+        <dd><%= row['sendtime']%></dd>
+        <dt>Message:</dt>
+          <dd><%= @textfield%></dd>
+          <hr>
+      <% end%>
+    </dl>
+  <% else%>
+    <div class="alert alert-danger">ACCESS DENIED</div>
+  <% end%>
 </div>

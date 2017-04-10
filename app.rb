@@ -3,24 +3,10 @@ require 'sinatra'
 require 'sinatra/reloader'
 require 'sqlite3'
 
-#configure do
+def get_db
 	db = SQLite3::Database.new './public/main.db'
-	db.execute 'CREATE TABLE IF NOT EXISTS
-							"Users"
-							( "id" INTEGER PRIMARY KEY AUTOINCREMENT,
-								"username" TEXT,
-								"phone" TEXT,
-								"datestamp" TEXT,
-								"master" TEXT,
-								"color" TEXT )'
-#end
-
-def file_read file
-	f = File.open file
-	while (line=f.gets)
-		@entry=@entry+line+"<br>"
-	end
-	f.close
+	db.results_as_hash = true
+	return db
 end
 
 def input_errors? hh
@@ -33,6 +19,29 @@ def input_errors? hh
 		end
 end
 
+configure do
+	db = get_db
+	db.execute 'CREATE TABLE IF NOT EXISTS
+							"Users"
+							( "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+								"username" TEXT,
+								"phone" TEXT,
+								"datestamp" TEXT,
+								"master" TEXT,
+								"color" TEXT )'
+	db.execute 'CREATE TABLE IF NOT EXISTS
+							"Contacts"
+							( "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+								"email" TEXT,
+								"message" TEXT,
+								"sendtime" TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL)'
+	db.execute 'CREATE TABLE IF NOT EXISTS
+							"Masters"
+							( "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+								"master" TEXT)'
+
+end
+
 get '/' do
 	erb :index
 end
@@ -42,6 +51,9 @@ get '/about' do
 end
 
 get '/visit' do
+	db=get_db
+	@master_list = db.execute 'SELECT * FROM Masters'
+
 	erb :visit
 end
 
@@ -58,14 +70,14 @@ post '/' do
 				}
 
 	return erb :index if input_errors? hh
+	db=get_db
 
 	if @login == "admin" && @password == "secret"
-		@entry="<label>Booked:</label><br><br>"
-		file_read "./public/users.txt"
-		@entry=@entry+"<br>"+"<br>"+"<label>Questions:</label>"+"<br>"
-		file_read "./public/questions.txt"
+		@entry = db.execute 'SELECT * FROM Users ORDER by datestamp'
+		@message = db.execute 'SELECT * FROM Contacts ORDER by sendtime desc'
 	else
-		@entry='<div class="alert alert-danger">ACCESS DENIED</div>'
+		@entry=nil
+		@message=nil
 	end
 
 	erb :admin
@@ -79,6 +91,9 @@ post '/visit' do
 	@master = params[:master]
 	@color = params[:color]
 
+	db=get_db
+	@master_list = db.execute 'SELECT * FROM Masters'
+
 	hh = {:username => 'Enter name',
 				:phone => 'Enter phone',
 				:time => 'Enter time'
@@ -88,10 +103,6 @@ post '/visit' do
 
 	db.execute 'INSERT INTO Users (username, phone, datestamp, master, color) VALUES (?, ?, ?, ?, ?)', [@username, @phone, @time, @master, @color]
 
-	f = File.open "./public/users.txt", "a"
-	f.write "User: #{@username}, Phone: #{@phone}, Time: #{@time}, Master: #{@master}, Color: #{@color}\n"
-	f.close
-
 	erb "<div class='alert alert-success'>Thanks #{@username}! #{@master} is waiting you at #{@time}.</div>"
 end
 
@@ -99,15 +110,15 @@ post '/contacts' do
 	@email = params[:email]
 	@text = params[:text]
 
+	db=get_db
+
 	hh = {:email => 'Enter your e-mail',
 				:text => 'Enter your message',
 				}
 
 	return erb :contacts if input_errors? hh
 
-	f = File.open "./public/questions.txt", "a"
-	f.write "\nE-mail: #{@email},\n\nText:\n#{@text}\n==============="
-	f.close
+	db.execute 'INSERT INTO Contacts (email, message) VALUES (?, ?)', [@email, @text]
 
 	erb "<div class='alert alert-success'>Thanks! We will answer you to #{@email} soon.</div>"
 end

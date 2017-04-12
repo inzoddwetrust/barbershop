@@ -54,6 +54,11 @@ configure do
 	seed_db db, ['Jessie Pinkman', 'Walter White', 'Gus Fring', 'Zodd Zverev']
 end
 
+before do
+	db=get_db
+	@master_list = db.execute 'SELECT * FROM Masters'
+end
+
 get '/' do
 	erb :index
 end
@@ -63,10 +68,7 @@ get '/about' do
 end
 
 get '/visit' do
-	db=get_db
-	@master_list = db.execute 'SELECT * FROM Masters'
-
-	erb :visit
+		erb :visit
 end
 
 get '/contacts' do
@@ -104,13 +106,12 @@ post '/visit' do
 	@master = params[:master]
 	@color = params[:color]
 
-	db=get_db
-	@master_list = db.execute 'SELECT * FROM Masters'
-
 	hh = {:username => 'Enter name',
 				:phone => 'Enter phone',
 				:time => 'Enter time'
 				}
+
+	db=get_db
 
 	return erb :visit if input_errors? hh
 

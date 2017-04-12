@@ -9,6 +9,18 @@ def get_db
 	return db
 end
 
+def is_barber_exist? db, master
+	db.execute('SELECT * FROM Masters WHERE master=?',[master]).length > 0
+end
+
+def seed_db db, barbers
+	barbers.each do |barber|
+		if !is_barber_exist? db, barber
+			db.execute 'INSERT INTO Masters (master) values (?)', [barber]
+		end
+	end
+end
+
 def input_errors? hh
 		@error = hh.select{|key| params[key] == ""}.values.join(", then ").capitalize
 		if @error == ''
@@ -39,7 +51,7 @@ configure do
 							"Masters"
 							( "id" INTEGER PRIMARY KEY AUTOINCREMENT,
 								"master" TEXT)'
-
+	seed_db db, ['Jessie Pinkman', 'Walter White', 'Gus Fring', 'Zodd Zverev']
 end
 
 get '/' do
